@@ -5,7 +5,14 @@ provider "aws" {
 variable "example_instance_type" {
     default = "t2.micro"
 }
-
+module "web_server" {
+    source = "./http_server"
+    instance_type = var.example_instance_type
+}
+output "public_dns" {
+    value = aws_instance.default.public_dns
+}
+/*
 resource "aws_instance" "example"{
     ami = "ami-0218d08a1f9dac831"
     instance_type = var.example_instance_type
@@ -33,3 +40,4 @@ resource "aws_security_group" "example_ec2" {
 output "example_instance_id" {
     value = aws_instance.example.id
 }
+*/
