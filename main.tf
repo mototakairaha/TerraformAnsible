@@ -8,4 +8,10 @@ resource "aws_instance" "example"{
     tags = {
         Name = "example"
     }
+    user_data = <<EOF
+        #!/bin/bash
+        yum install -y httpd
+        systemctl start httpd.service
+        systemctl enable httpd.service
+    EOF
 }
