@@ -2,7 +2,63 @@ provider "aws" {
     region = "ap-northeast-1"
 }
 
-variable "example_instance_type" {
+module "describe_regions_for_ec2" {
+    source = "./iam_role"
+    name = "describe-region-for-ec2"
+    identifier = "ec2.amazonaws.com"
+    policy = data.aws_iam_policy_document.allow_describe_regions.json
+}
+resource "aws_s3_bucket" "private" {
+    bucket = "private-pragmatic-terraform"
+    versioning{
+        enable = false
+    }
+    server_side_encryption_configuration{
+        rule{
+            apply_server_side_encryption_by_default{
+                sse_algrithm = "AES256"
+            }
+        }
+    }
+}
+resource "aws_s3_bucket_public_access_block" "private" {
+    bucket = aws_s3_bucket.private.id
+    block_public_acls = true
+    block_public_policy = true
+    ignore_public_acls = true
+    restrict_public_buckets = true
+}
+/*
+data "aws_iam_policy_document" "allow_describe_regions" {
+    statement {
+        effect = "Allow"
+        actions = ["ec2:DescribeRegions"]
+        resource = ["*"]
+    }
+}
+resource "aws_iam_group_policy" "example" {
+    name = "example"
+    policy = data.aws_iam_policy_document.allow_describe_regions.json
+}
+data "aws_iam_policy_document" "ec2_assume_role" {
+    statement {
+        actions = ["sts:AssumeRole"]
+        principals {
+            type = "Service"
+            identifiers = ["ec2.amazonaws.com"]
+        }
+    }
+}
+resource "aws_iam_role" "example" {
+    name = "example"
+    assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
+}
+resource "aws_iam_group_policy_attachment" "example" {
+    role = aws_iam_role.examle.name
+    policy_arn = aws_iam_group_policy.example.arn
+}
+
+variable "exampl/*e_instance_type" {
     default = "t2.micro"
 }
 module "web_server" {
@@ -12,7 +68,7 @@ module "web_server" {
 output "public_dns" {
     value = module.web_server.public_dns
 }
-/*
+
 resource "aws_instance" "example"{
     ami = "ami-0218d08a1f9dac831"
     instance_type = var.example_instance_type
