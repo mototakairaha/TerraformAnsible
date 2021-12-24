@@ -13,12 +13,7 @@ resource "aws_instance" "example"{
     tags = {
         Name = "example"
     }
-    user_data = <<EOF
-        #!/bin/bash
-        yum install -y httpd
-        systemctl start httpd.service
-        systemctl enable httpd.service
-    EOF
+    user_data = file("./user_data.sh")
 }
 resource "aws_security_group" "example_ec2" {
     name = "example-ec2"
