@@ -10,7 +10,7 @@ module "web_server" {
     instance_type = var.example_instance_type
 }
 output "public_dns" {
-    value = aws_instance.default.public_dns
+    value = module.web_server.public_dns
 }
 /*
 resource "aws_instance" "example"{
